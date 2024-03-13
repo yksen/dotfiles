@@ -1,0 +1,5 @@
+[user]
+	email = selegakamil@gmail.com
+	name = xen
+[alias]
+	lov = log --oneline --graph --all
