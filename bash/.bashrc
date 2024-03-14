@@ -10,9 +10,10 @@ done;
 unset file;
 
 shopt -s cdspell;
-shopt -s checkwinsize
-shopt -s globstar
+shopt -s checkwinsize;
+shopt -s extglob
+shopt -s globstar;
 shopt -s histappend;
 shopt -s nocaseglob;
 
-eval "$(zoxide init bash --cmd cd)"
+eval "$(zoxide init bash --cmd cd)";

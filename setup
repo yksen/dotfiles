@@ -1,0 +1,30 @@
+#!/bin/bash
+
+shopt -s globstar
+
+while getopts ":r" option; do
+    case $option in
+        r)
+        RUN=true;;
+    esac
+done
+
+SOURCE_DIR="$(realpath .)"
+TARGET_DIR="$HOME"
+
+for file in $(find $SOURCE_DIR -type f -name "*" -not -name "README.md" -not -name "setup" -not -path "*/.git/*"); do
+    if [[ -f "$file" ]]; then
+        target_file=$file
+        source_file=$HOME/$(echo ${file/$SOURCE_DIR} | cut -d'/' -f3-)
+        if [[ $RUN = true ]]; then
+            mkdir -p $(dirname $source_file)
+            ln -sf "$file" "$target/$source_file"
+        else
+            echo "ln -sf $target_file $source_file";
+        fi
+    fi
+done
+
+if [[ -z ${RUN+x} ]]; then
+    echo "This was a dry run, use with -r to execute"
+fi
