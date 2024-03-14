@@ -1,0 +1,9 @@
+# .aliases
+
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias grep='grep --color=auto'
+alias la="lsd -Al --blocks permission,size,date,name"
+alias lg='lazygit'
+alias ll="lsd -l --blocks permission,size,date,name"
+alias tree='lsd --tree'

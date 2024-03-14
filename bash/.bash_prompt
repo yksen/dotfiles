@@ -1,0 +1,27 @@
+# .bash_prompt
+
+function timerStart {
+    timerStart=${timerStart:-$(date +%s%N)}
+}
+
+function timerStop {
+    local delta_us=$((($(date +%s%N) - $timerStart) / 1000))
+    local us=$((delta_us % 1000))
+    local ms=$(((delta_us / 1000) % 1000))
+    local s=$(((delta_us / 1000000) % 60))
+    local m=$(((delta_us / 60000000) % 60))
+    local h=$((delta_us / 3600000000))
+    if ((h > 0)); then timerString=${h}h${m}m
+        elif ((m > 0)); then timerString=${m}m${s}s
+        elif ((s >= 10)); then timerString=${s}.$((ms / 100))s
+        elif ((s > 0)); then timerString=${s}.$(printf %03d $ms)s
+        elif ((ms >= 100)); then timerString=${ms}ms
+        elif ((ms > 0)); then timerString=${ms}.$((us / 100))ms
+    else timerString=${us}us
+    fi
+    unset timerStart
+}
+
+trap '__=$_; timerStart; : "$__"' DEBUG
+export PROMPT_COMMAND='timerStop'
+export PS1='$(tput bold)\[\e[38;5;165m\]\u\[\e[38;5;171m\]@\[\e[38;5;213m\]\h \[\e[38;5;219m\]\W $(tput setaf 7)(${timerString}) $\[\033[0m\] '

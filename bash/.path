@@ -1,0 +1,3 @@
+# .path
+
+export PATH=$PATH:~/.local/bin
