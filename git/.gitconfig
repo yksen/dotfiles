@@ -1,5 +1,39 @@
+[color]
+	ui = auto
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
 [user]
-	email = selegakamil@gmail.com
 	name = xen
+	email = selegakamil@gmail.com
 [alias]
-	lov = log --oneline --graph --all
+	lov = log --all --oneline --graph
+	difw = diff --word-diff
+[core]
+	pager = delta
+	editor = vim
+	excludefiles = /home/selega/.gitignore
+	excludesFile = /home/selega/.gitignore
+[push]
+	autoSetupRemote = true
+	default = current
+[pull]
+	rebase = true
+[rebase]
+	autosquash = true
+	autostash = true
+[rerere]
+	enabled = true
+[help]
+	autocorrect = immediate
+[interactive]
+    diffFilter = delta --color-only
+[delta]
+    navigate = true
+    light = false
+[merge]
+    conflictstyle = diff3
+[diff]
+    colorMoved = default
