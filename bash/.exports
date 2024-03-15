@@ -1,8 +1,10 @@
 # .exports
 
+export DISPLAY=$(hostname).local:0
 export FZF_DEFAULT_COMMAND='find .'
 export HISTCONTROL='ignoreboth';
 export HISTSIZE=
 export HISTFILESIZE=
 export LANG=en_US.UTF-8
+export LIBGL_ALWAYS_INDIRECT=1
 export MANPAGER='less -X';
