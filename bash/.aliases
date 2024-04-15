@@ -8,5 +8,5 @@ alias la="lsd -Al --blocks permission,size,date,name"
 alias lg='lazygit'
 alias ll="lsd -l --blocks permission,size,date,name"
 alias tree='lsd --tree'
-alias vi='nvim'
-alias vim='nvim'
+alias nv='nvim'
+alias nvi='nvim'

@@ -1,3 +1,5 @@
-.cache
-.vscode
-build
+.clang-tidy
+
+.cache/
+.vscode/
+build/

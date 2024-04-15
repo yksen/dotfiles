@@ -38,7 +38,7 @@ RESET="$(tput sgr0)"
 
 ENABLE_USERNAME_HOSTNAME=false
 if [ $ENABLE_USERNAME_HOSTNAME = true ]; then
-    export PS1='\[${BOLD}\]\[\e[38;5;165m\]\u\[\e[38;5;171m\]@\[\e[38;5;213m\]\h \[\e[38;5;219m\]\W \[${WHITE}\](${timerString}) \[${RESET}\] '
+    export PS1='\[${BOLD}\]\[\e[38;5;165m\]\u\[\e[38;5;171m\]@\[\e[38;5;213m\]\h \[\e[38;5;219m\]\W \[${WHITE}\](${timerString}) \[${RESET}\]$ '
 else
-    export PS1='\[${BOLD}\]\[\e[38;5;219m\]\W \[${WHITE}\](${timerString}) \[${RESET}\] '
+    export PS1='\[${BOLD}\]\[\e[38;5;219m\]\W \[${WHITE}\](${timerString}) \[${RESET}\]$ '
 fi
