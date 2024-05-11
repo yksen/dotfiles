@@ -14,13 +14,13 @@ TARGET_DIR="$HOME"
 
 for file in $(find $SOURCE_DIR -type f -name "*" -not -name "README.md" -not -name "setup" -not -path "*/.git/*"); do
     if [[ -f "$file" ]]; then
-        target_file=$file
-        source_file=$HOME/$(echo ${file/$SOURCE_DIR} | cut -d'/' -f3-)
+        TARGET_PATH=$file
+        SOURCE_PATH=$HOME/$(echo ${file/$SOURCE_DIR} | cut -d'/' -f3-)
         if [[ $RUN = true ]]; then
-            mkdir -p $(dirname $source_file)
-            ln -sf "$file" "$target/$source_file"
+            mkdir -p $(dirname $SOURCE_PATH)
+            ln -sf "$TARGET_PATH" "$SOURCE_PATH"
         else
-            echo "ln -sf $target_file $source_file";
+            echo "ln -sf $TARGET_PATH $SOURCE_PATH";
         fi
     fi
 done
