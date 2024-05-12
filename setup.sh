@@ -12,7 +12,7 @@ done
 SOURCE_DIR="$(realpath .)"
 TARGET_DIR="$HOME"
 
-for file in $(find $SOURCE_DIR -type f -name "*" -not -name "README.md" -not -name "setup" -not -path "*/.git/*"); do
+for file in $(find $SOURCE_DIR -type f -name "*" -not -name "README.md" -not -path "*/setup*" -not -path "*/.git/*" -not -path "*/powershell/*"); do
     if [[ -f "$file" ]]; then
         TARGET_PATH=$file
         SOURCE_PATH=$HOME/$(echo ${file/$SOURCE_DIR} | cut -d'/' -f3-)
