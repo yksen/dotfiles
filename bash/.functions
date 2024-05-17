@@ -1,1 +1,8 @@
 # .functions
+
+function dtm() {
+    for arg in "$@"; do
+        echo "Modifying $arg"
+        devtool modify "$arg"
+    done
+}
