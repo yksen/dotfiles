@@ -5,7 +5,7 @@ alias dt='devtool "$@"'
 alias egrep='egrep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias grep='grep --color=auto'
-alias la="lsd -A --blocks permission,size,date,name"
+alias la="lsd -A"
 alias lg='lazygit'
 alias ll="lsd -Al --blocks permission,size,date,name"
 alias tree='lsd --tree'
