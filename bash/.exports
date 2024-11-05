@@ -1,7 +1,8 @@
 # .exports
 
-export DISPLAY=$(hostname).local:0
 export FZF_DEFAULT_COMMAND='find .'
+export GTK_THEME=Adwaita:dark
+export QT_STYLE_OVERRIDE=Adwaita:dark
 export HISTCONTROL='ignoreboth';
 export HISTSIZE=10000
 export HISTFILESIZE=10000
