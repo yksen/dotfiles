@@ -17,3 +17,4 @@ shopt -s histappend;
 shopt -s nocaseglob;
 
 eval "$(zoxide init bash --cmd cd)";
+. "$HOME/.cargo/env"
