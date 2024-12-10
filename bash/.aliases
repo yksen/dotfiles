@@ -9,6 +9,7 @@ alias la="lsd -A"
 alias lg='lazygit'
 alias ll="lsd -Al --blocks permission,size,date,name"
 alias rga='rg --hidden --no-ignore --no-messages'
+alias rgi='rg -i'
 alias tree='lsd --tree'
 alias nv='nvim'
 alias nvi='nvim'
