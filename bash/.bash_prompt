@@ -30,7 +30,7 @@ function timerStop {
 }
 
 trap '__=$_; timerStart; : "$__"' DEBUG
-export PROMPT_COMMAND='timerStop'
+export PROMPT_COMMAND='timerStop; history -a'
 
 BOLD="$(tput bold)"
 WHITE="$(tput setaf 7)"
