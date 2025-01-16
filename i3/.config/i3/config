@@ -12,6 +12,10 @@
 set $mod Mod4
 
 mouse_warping none
+focus_follows_mouse no
+
+default_border none
+hide_edge_borders smart
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
