@@ -15,8 +15,8 @@ order += "tztime local"
 read_file VPN {
         path = /sys/class/net/vpn0/operstate
         format = "%title %content"
-        format_bad = "%title down"
-        max_characters = 8
+        color_good = "#ffffff"
+        max_characters = 4
 }
 
 wireless _first_ {
