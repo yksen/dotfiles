@@ -12,13 +12,6 @@ order += "load"
 order += "memory"
 order += "tztime local"
 
-read_file VPN {
-        path = /sys/class/net/vpn0/operstate
-        format = "%title %content"
-        color_good = "#ffffff"
-        max_characters = 4
-}
-
 wireless _first_ {
         format_up = "%quality at %essid %ip"
         format_down = ""
@@ -27,6 +20,15 @@ wireless _first_ {
 ethernet _first_ {
         format_up = "%ip (%speed)"
         format_down = ""
+}
+
+read_file VPN {
+        path = /sys/class/net/vpn0/operstate
+        format = "%title %content"
+        format_bad = "%title down"
+        color_good = "#ffffff"
+        color_bad = "#ffffff"
+        max_characters = 4
 }
 
 battery all {
