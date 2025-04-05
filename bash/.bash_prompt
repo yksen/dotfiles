@@ -1,11 +1,21 @@
 # .bash_prompt
 
-function timerStart {
-    timerStart=${timerStart:-$(date +%s%N)}
+BOLD="$(tput bold)"
+WHITE="$(tput setaf 7)"
+PINK="\e[38;5;198m"
+RESET="$(tput sgr0)"
+
+SAVE_POS='\e[s'
+RESTORE_POS='\e[u'
+
+RIGHT_PROMPT="$HOSTNAME"
+
+function timer {
+    TIMER=${TIMER:-$(date +%s%N)}
 }
 
-function timerStop {
-    local delta_us=$((($(date +%s%N) - $timerStart) / 1000))
+function prompt {
+    local delta_us=$((($(date +%s%N) - $TIMER) / 1000))
     local us=$((delta_us % 1000))
     local ms=$(((delta_us / 1000) % 1000))
     local s=$(((delta_us / 1000000) % 60))
@@ -26,15 +36,13 @@ function timerStop {
     else
         timerString=${us}us
     fi
-    unset timerStart
+    unset TIMER
+
+    local left_prompt='\[${BOLD}\]'"\[${PINK}\]"'\W \[${WHITE}\](${timerString})\[${RESET}\]'
+
+    PS1="\[${SAVE_POS}\e[${COLUMNS:-$(tput cols)}C\e[$((${#RIGHT_PROMPT} - 1))D${RIGHT_PROMPT}${RESTORE_POS}\]${left_prompt} "
 }
 
-trap '__=$_; timerStart; : "$__"' DEBUG
-export PROMPT_COMMAND='timerStop; history -a'
+trap '__=$_; timer; : "$__"' DEBUG
+export PROMPT_COMMAND='prompt; history -a'
 
-BOLD="$(tput bold)"
-WHITE="$(tput setaf 7)"
-PINK="\e[38;5;198m"
-RESET="$(tput sgr0)"
-
-export PS1='\[${BOLD}\]'"\[${PINK}\]"'\W \[${WHITE}\](${timerString})\[${RESET}\] '
