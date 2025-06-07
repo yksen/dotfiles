@@ -17,6 +17,14 @@ LABEL=
 #LABEL=⚡
 #BAT_NUMBER=0
 
+[temperature]
+command=$SCRIPT_DIR/temperature
+label=
+interval=10
+T_WARN=70
+T_CRIT=90
+#SENSOR_CHIP=""
+
 [disk]
 command=$SCRIPT_DIR/disk
 LABEL=
