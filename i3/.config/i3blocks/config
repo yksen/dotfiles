@@ -41,6 +41,14 @@ command=$SCRIPT_DIR/memory
 label=
 interval=30
 
+[metars]
+command=$SCRIPT_DIR/metars
+interval=2100
+METARSSTATION=EPWR
+METARSURL=https://tgftp.nws.noaa.gov/data/observations/metar/stations/{}.TXT
+METARSENABLEMENTS={ "temperature": true, "dewpoint" : false, "feelsLike" : true, "wind" : false, "pressure" : false, "visibility" : false, "windDirType" : "text", "useInverseWind" : false }
+METARSCONFIGS={ "temperatureUnit" : "C", "temperatureSym" : "°C", "pressureUnit" : "HPA", "pressureSym" : "hPa", "speedUnit" : "MPS", "speedSym" : "m/s", "distanceUnit" : "KM", "distanceSym" : "km", "precipitationUnit" : "CM", "precipitationSym" : "cm"}
+
 [time]
 command=$SCRIPT_DIR/time
 interval=1
