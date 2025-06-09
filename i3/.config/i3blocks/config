@@ -21,6 +21,13 @@ label=wifi:
 INTERFACE=wlp2s0
 interval=60
 
+[nm-vpn]
+command=$SCRIPT_DIR/nm-vpn
+#init_color=#FFFF00
+#on_color=#00FF00
+label=VPN:
+interval=5
+
 [battery]
 command=$SCRIPT_DIR/battery
 interval=30
