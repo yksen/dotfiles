@@ -10,6 +10,17 @@ color=#00FF00
 interval=10
 display_wifi_name=0
 
+[ssid]
+command=$SCRIPT_DIR/ssid
+INTERFACE=wlp2s0
+interval=60
+
+[wifi]
+command=$SCRIPT_DIR/wifi
+label=wifi:
+INTERFACE=wlp2s0
+interval=60
+
 [battery]
 command=$SCRIPT_DIR/battery
 interval=30
