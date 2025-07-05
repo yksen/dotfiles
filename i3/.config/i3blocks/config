@@ -54,6 +54,14 @@ interval=30
 command=$SCRIPT_DIR/load_average
 interval=10
 
+[gpu-load]
+command=$SCRIPT_DIR/gpu-load
+label=
+interval=10
+#min_width=99% 99% 99% 99%
+T_WARN=70
+T_CRIT=90
+
 [memory]
 command=$SCRIPT_DIR/memory
 label=
