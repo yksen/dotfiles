@@ -1,4 +1,7 @@
 # .path
 
-. "$HOME/.cargo/env"
-export PATH=$PATH:~/.local/bin
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
+
+export BUN_INSTALL="$HOME/.bun"
+
+export PATH="$PATH:$HOME/.local/bin:$BUN_INSTALL/bin"
