@@ -6,3 +6,12 @@ function dtm() {
         devtool modify "$arg"
     done
 }
+
+function gsa() {
+    for dir in */; do
+        if [ -d "$dir/.git" ]; then
+            echo "$dir"
+            git -C "$dir" status -s
+        fi
+    done
+}
