@@ -75,6 +75,16 @@ METARSURL=https://tgftp.nws.noaa.gov/data/observations/metar/stations/{}.TXT
 METARSENABLEMENTS={ "temperature": true, "dewpoint" : false, "feelsLike" : true, "wind" : false, "pressure" : false, "visibility" : false, "windDirType" : "text", "useInverseWind" : false }
 METARSCONFIGS={ "temperatureUnit" : "C", "temperatureSym" : "°C", "pressureUnit" : "HPA", "pressureSym" : "hPa", "speedUnit" : "MPS", "speedSym" : "m/s", "distanceUnit" : "KM", "distanceSym" : "km", "precipitationUnit" : "CM", "precipitationSym" : "cm"}
 
+[volume]
+command=$SCRIPT_DIR/volume
+#LABEL=♪
+LABEL=VOL
+interval=once
+signal=10
+#STEP=5%
+#MIXER=[determined automatically]
+#SCONTROL=[determined automatically]
+
 [time]
 command=$SCRIPT_DIR/time
 interval=1
