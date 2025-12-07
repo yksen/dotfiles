@@ -194,7 +194,3 @@ bindsym $mod+r mode "resize"
 bar {
         status_command 2>/tmp/err SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks -vvv
 }
-
-workspace 1 output HDMI-0
-workspace 2 output DP-4
-workspace 3 output DP-2
