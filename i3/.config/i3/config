@@ -48,6 +48,7 @@ bindsym XF86Launch2 exec --no-startup-id maim --select | xclip -selection clipbo
 bindsym Control+$mod+l exec --no-startup-id ~/.config/i3/lock.sh
 bindsym Control+$mod+v exec --no-startup-id copyq toggle
 bindsym $mod+period exec --no-startup-id rofimoji
+bindsym Control+$mod+h exec --no-startup-id autorandr -c horizontal
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
