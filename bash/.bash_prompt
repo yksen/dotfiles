@@ -38,9 +38,11 @@ function prompt {
     fi
     unset TIMER
 
+    local cols=${COLUMNS:-$(tput cols)}
+    local rp_len=${#RIGHT_PROMPT}
     local left_prompt='\[${BOLD}\]'"\[${PINK}\]"'\W \[${WHITE}\](${timerString})\[${RESET}\]'
 
-    PS1="\[${SAVE_POS}\e[${COLUMNS:-$(tput cols)}C\e[$((${#RIGHT_PROMPT} - 1))D\]${RIGHT_PROMPT}\[${RESTORE_POS}\]${left_prompt} "
+    PS1="\[${SAVE_POS}\e[${cols}G\e[${rp_len}D\]${RIGHT_PROMPT}\[${RESTORE_POS}\]${left_prompt} "
 }
 
 trap '__=$_; timer; : "$__"' DEBUG
