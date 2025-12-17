@@ -1,14 +1,10 @@
 # .bash_prompt
 
 BOLD="$(tput bold)"
-WHITE="$(tput setaf 7)"
-PINK="\e[38;5;198m"
+PATH_COLOR="\e[38;5;198m"
+HOSTNAME_COLOR="\e[38;5;200m"
+TIMER_COLOR="\e[38;5;219m"
 RESET="$(tput sgr0)"
-
-SAVE_POS='\e[s'
-RESTORE_POS='\e[u'
-
-RIGHT_PROMPT="$HOSTNAME"
 
 function timer {
     TIMER=${TIMER:-$(date +%s%N)}
@@ -23,26 +19,22 @@ function prompt {
     local h=$((delta_us / 3600000000))
     if ((h > 0)); then
         timerString=${h}h${m}m
-    elif ((m > 0)); then
+        elif ((m > 0)); then
         timerString=${m}m${s}s
-    elif ((s >= 10)); then
+        elif ((s >= 10)); then
         timerString=${s}.$((ms / 100))s
-    elif ((s > 0)); then
+        elif ((s > 0)); then
         timerString=${s}.$(printf %03d $ms)s
-    elif ((ms >= 100)); then
+        elif ((ms >= 100)); then
         timerString=${ms}ms
-    elif ((ms > 0)); then
+        elif ((ms > 0)); then
         timerString=${ms}.$((us / 100))ms
     else
         timerString=${us}us
     fi
     unset TIMER
 
-    local cols=${COLUMNS:-$(tput cols)}
-    local rp_len=${#RIGHT_PROMPT}
-    local left_prompt='\[${BOLD}\]'"\[${PINK}\]"'\W \[${WHITE}\](${timerString})\[${RESET}\]'
-
-    PS1="\[${SAVE_POS}\e[${cols}G\e[${rp_len}D\]${RIGHT_PROMPT}\[${RESTORE_POS}\]${left_prompt} "
+    PS1='\[${BOLD}\]'"\[${PATH_COLOR}\]"'\W '"\\[${HOSTNAME_COLOR}\\]"$HOSTNAME' '"\\[${TIMER_COLOR}\\]"'(${timerString})\[${RESET}\] '
 }
 
 trap '__=$_; timer; : "$__"' DEBUG
