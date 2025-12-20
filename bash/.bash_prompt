@@ -34,7 +34,7 @@ function prompt {
     fi
     unset TIMER
 
-    PS1='\[${BOLD}\]'"\[${PATH_COLOR}\]"'\W '"\\[${HOSTNAME_COLOR}\\]"$HOSTNAME' '"\\[${TIMER_COLOR}\\]"'(${timerString})\[${RESET}\] '
+    PS1='\[${BOLD}\]'"\\[${PATH_COLOR}\\]"$HOSTNAME' '"\[${HOSTNAME_COLOR}\]"'\W '"\\[${TIMER_COLOR}\\]"'(${timerString})\[${RESET}\] '
 }
 
 trap '__=$_; timer; : "$__"' DEBUG
