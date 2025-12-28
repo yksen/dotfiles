@@ -1,8 +1,10 @@
 #!/bin/bash
 
+# TODO: Try to set it before starting X server
 WALLPAPER_DIR=$( cd -- "$( dirname -- "$(readlink -f "${BASH_SOURCE[0]}")" )" &> /dev/null && pwd )
 feh --no-fehbg --bg-scale "$WALLPAPER_DIR/../wallpaper.png"
 
-for id in $(xinput list | grep -Po 'id=\K\d+(?=.*pointer)'); do
-    xinput --set-prop "$id" 'libinput Accel Speed' -0.7 2>/dev/null || true
-done
+# TODO: Set it per hardware device (don't change touchpad speed)
+# for id in $(xinput list | grep -Po 'id=\K\d+(?=.*pointer)'); do
+#     xinput --set-prop "$id" 'libinput Accel Speed' -0.7 2>/dev/null || true
+# done
