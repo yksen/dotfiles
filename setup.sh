@@ -15,7 +15,7 @@ install_packages() {
     if command -v dnf &>/dev/null; then
         PKG_MGR="DNF"
         PKG_FILE="dnf.txt"
-        INSTALL_CMD="sudo dnf install -y"
+        INSTALL_CMD="sudo dnf install -y --skip-unavailable"
     elif command -v apt &>/dev/null; then
         PKG_MGR="APT"
         PKG_FILE="apt.txt"
