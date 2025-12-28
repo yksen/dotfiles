@@ -51,5 +51,8 @@ for TARGET_DIR in $TARGET_DIRS; do
     done <<<"$TARGET_FILES"
 done
 
+echo "Rebuilding font cache..."
+fc-cache -fv
+
 echo ""
 echo "Setup complete!"
