@@ -1,0 +1,14 @@
+bat
+btop
+cmake
+fzf
+gcc
+gcc-c++
+git
+lazygit
+lsd
+neovim
+ripgrep
+tmux
+vim
+zoxide
