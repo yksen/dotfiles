@@ -43,6 +43,7 @@ bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl s 10%-
 bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl s 10%+
 
 bindsym Print exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
+bindsym Shift+Print exec --no-startup-id maim -s ~/downloads/$(date +%Y-%m-%d_%H-%M-%S).png
 bindsym XF86Launch2 exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
 
 bindsym Control+$mod+l exec --no-startup-id ~/.config/i3/lock.sh
