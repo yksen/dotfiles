@@ -41,7 +41,7 @@ function prompt {
         exitIndicator="\\[${ERROR_COLOR}\\][${exit_code}] "
     fi
 
-    PS1='\[${BOLD}\]'"${exitIndicator}\\[${HOSTNAME_COLOR}\\]"$HOSTNAME' '"\[${DIR_COLOR}\]"'\W '"\\[${TIMER_COLOR}\\]"'(${timerString})\[${RESET}\] '
+    PS1='\[${BOLD}\]'"${exitIndicator}\\[${HOSTNAME_COLOR}\\]"'${HOSTNAME%%.*} '"\[${DIR_COLOR}\]"'\W '"\\[${TIMER_COLOR}\\]"'(${timerString})\[${RESET}\] '
 }
 
 trap '__=$_; timer; : "$__"' DEBUG
