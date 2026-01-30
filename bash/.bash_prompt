@@ -1,9 +1,10 @@
 # .bash_prompt
 
 BOLD="$(tput bold)"
-PATH_COLOR="\e[38;5;198m"
-HOSTNAME_COLOR="\e[38;5;200m"
+HOSTNAME_COLOR="\e[38;5;198m"
+DIR_COLOR="\e[38;5;200m"
 TIMER_COLOR="\e[38;5;219m"
+ERROR_COLOR="\e[38;5;196m"
 RESET="$(tput sgr0)"
 
 function timer {
@@ -11,6 +12,7 @@ function timer {
 }
 
 function prompt {
+    local exit_code=$?
     local delta_us=$((($(date +%s%N) - $TIMER) / 1000))
     local us=$((delta_us % 1000))
     local ms=$(((delta_us / 1000) % 1000))
@@ -19,22 +21,27 @@ function prompt {
     local h=$((delta_us / 3600000000))
     if ((h > 0)); then
         timerString=${h}h${m}m
-        elif ((m > 0)); then
+    elif ((m > 0)); then
         timerString=${m}m${s}s
-        elif ((s >= 10)); then
+    elif ((s >= 10)); then
         timerString=${s}.$((ms / 100))s
-        elif ((s > 0)); then
+    elif ((s > 0)); then
         timerString=${s}.$(printf %03d $ms)s
-        elif ((ms >= 100)); then
+    elif ((ms >= 100)); then
         timerString=${ms}ms
-        elif ((ms > 0)); then
+    elif ((ms > 0)); then
         timerString=${ms}.$((us / 100))ms
     else
         timerString=${us}us
     fi
     unset TIMER
 
-    PS1='\[${BOLD}\]'"\\[${PATH_COLOR}\\]"$HOSTNAME' '"\[${HOSTNAME_COLOR}\]"'\W '"\\[${TIMER_COLOR}\\]"'(${timerString})\[${RESET}\] '
+    local exitIndicator=""
+    if ((exit_code != 0)); then
+        exitIndicator="\\[${ERROR_COLOR}\\][${exit_code}] "
+    fi
+
+    PS1='\[${BOLD}\]'"${exitIndicator}\\[${HOSTNAME_COLOR}\\]"$HOSTNAME' '"\[${DIR_COLOR}\]"'\W '"\\[${TIMER_COLOR}\\]"'(${timerString})\[${RESET}\] '
 }
 
 trap '__=$_; timer; : "$__"' DEBUG
