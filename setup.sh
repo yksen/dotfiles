@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 SOURCE_DIR="$HOME"
 TARGET_DIRS=$(ls "$SCRIPT_DIR"/*/ -d)
 
-EXCLUDES=(-not -path "*powershell*" -not -path "*AppData*" -not -path "*packages*")
+EXCLUDES=(-not -path "*packages*")
 
 install_packages() {
     local PACKAGE_DIR="$SCRIPT_DIR/packages"
