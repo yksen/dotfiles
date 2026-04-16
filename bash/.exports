@@ -1,5 +1,9 @@
 # .exports
 
+export PRIMARY_COLOR="\e[38;5;198m"
+export SECONDARY_COLOR="\e[38;5;200m"
+export TERTIARY_COLOR="\e[38;5;219m"
+
 export FZF_DEFAULT_COMMAND='find .'
 export GTK_THEME=Adwaita:dark
 export QT_STYLE_OVERRIDE=Adwaita:dark
