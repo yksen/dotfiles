@@ -1,4 +1,7 @@
 # ~/.config/yazi/yazi.toml
 
+[mgr]
+linemode = "mtime"
+
 [preview]
 ueberzug_scale = 1.13
