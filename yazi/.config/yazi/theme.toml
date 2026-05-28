@@ -1,0 +1,5 @@
+# ~/.config/yazi/theme.toml
+
+[flavor]
+use = "tokyo-night"
+dark = "tokyo-night"
