@@ -35,24 +35,36 @@ install_packages() {
     [[ $REPLY =~ ^[Yy]$ ]] && $INSTALL_CMD $PACKAGES
 }
 
-install_packages
+create_symlinks() {
+    read -p "Create symlinks for dotfiles? (y/N) " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]] || return
 
-echo "Creating symlinks for dotfiles..."
-for TARGET_DIR in $TARGET_DIRS; do
-    TARGET_FILES=$(find "$TARGET_DIR" -type f "${EXCLUDES[@]}")
-    if [ -z "$TARGET_FILES" ]; then
-        continue
-    fi
-    while IFS= read -r TARGET_FILE; do
-        SOURCE_PATH="$SOURCE_DIR/$(echo "${TARGET_FILE/$SOURCE_DIR/}" | cut -d '/' -f4-)"
-        mkdir -p "$(dirname "${SOURCE_PATH}")"
-        ln -sf "$TARGET_FILE" "$SOURCE_PATH"
-        echo "  Linked: $TARGET_FILE -> $SOURCE_PATH"
-    done <<<"$TARGET_FILES"
-done
+    echo "Creating symlinks for dotfiles..."
+    for TARGET_DIR in $TARGET_DIRS; do
+        TARGET_FILES=$(find "$TARGET_DIR" -type f "${EXCLUDES[@]}")
+        if [ -z "$TARGET_FILES" ]; then
+            continue
+        fi
+        while IFS= read -r TARGET_FILE; do
+            SOURCE_PATH="$SOURCE_DIR/$(echo "${TARGET_FILE/$SOURCE_DIR/}" | cut -d '/' -f4-)"
+            mkdir -p "$(dirname "${SOURCE_PATH}")"
+            ln -sf "$TARGET_FILE" "$SOURCE_PATH"
+            echo "  Linked: $TARGET_FILE -> $SOURCE_PATH"
+        done <<<"$TARGET_FILES"
+    done
+}
 
-echo "Rebuilding font cache..."
-fc-cache -fv
+rebuild_font_cache() {
+    read -p "Rebuild font cache? (y/N) " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]] && fc-cache -fv
+}
 
-echo ""
-echo "Setup complete!"
+main() {
+    install_packages
+    create_symlinks
+    rebuild_font_cache
+}
+
+main
