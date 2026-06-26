@@ -12,8 +12,9 @@ export HISTSIZE=
 export HISTFILE=~/.bash_history_eternal
 export HISTFILESIZE=
 export LANGUAGE=en_US.UTF-8
-export LIBGL_ALWAYS_INDIRECT=1
 export LC_CTYPE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
 export MANPAGER='less -X';
 export EDITOR=vim
+
+command -v kitty &> /dev/null && export TERMINAL=kitty
