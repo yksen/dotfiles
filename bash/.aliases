@@ -13,3 +13,5 @@ alias nvi='nvim'
 alias rga='rg --hidden --no-ignore --no-messages'
 alias rgi='rg -i'
 alias tree='lsd --tree'
+[ "$TERM" = "xterm-kitty" ] && alias ssh="kitty +kitten ssh"
+
