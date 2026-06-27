@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 SOURCE_DIR="$HOME"
 TARGET_DIRS=$(ls "$SCRIPT_DIR"/*/ -d)
 
-EXCLUDES=(-not -path "*packages*")
+EXCLUDES=(-not -path "*packages*" -not -path "*xorg.conf.d*")
 
 LOG_FILE="${TMPDIR:-/tmp}/dotfiles-setup.log"
 
@@ -158,6 +158,52 @@ rebuild_font_cache() {
     fi
 }
 
+ROOT_FILES=(
+    "x11/xorg.conf.d/60-mouse-accel.conf:/etc/X11/xorg.conf.d/60-mouse-accel.conf"
+)
+
+install_root_files() {
+    if [ "${#ROOT_FILES[@]}" -eq 0 ]; then
+        status skip "Root files: nothing to install"
+        return
+    fi
+
+    # Skip the prompt (and sudo) entirely when every file is already in place.
+    local needs_install=0 entry src dest
+    for entry in "${ROOT_FILES[@]}"; do
+        src="$SCRIPT_DIR/${entry%%:*}" dest="${entry#*:}"
+        cmp -s "$src" "$dest" || needs_install=1
+    done
+
+    if [ "$needs_install" -eq 0 ]; then
+        status ok "Root files" "already up to date"
+        return
+    fi
+
+    if ! ask "Copy ${#ROOT_FILES[@]} file(s) to system paths (needs sudo)?"; then
+        status skip "Root files: declined"
+        return
+    fi
+
+    local copied=0 failed=0
+    for entry in "${ROOT_FILES[@]}"; do
+        src="$SCRIPT_DIR/${entry%%:*}" dest="${entry#*:}"
+        if run_quiet sudo mkdir -p "$(dirname "$dest")" && run_quiet sudo cp "$src" "$dest"; then
+            ((copied++))
+        else
+            ((failed++))
+            echo "failed to copy $src -> $dest" >>"$LOG_FILE"
+        fi
+    done
+
+    local detail="$copied copied, $failed failed"
+    if [ "$failed" -eq 0 ]; then
+        status ok "Root files" "$detail"
+    else
+        status fail "Root files (see $LOG_FILE)" "$detail"
+    fi
+}
+
 final_summary() {
     printf "\n  ${C_OK}%d ok${C_RESET}, ${C_FAIL}%d failed${C_RESET}, ${C_SKIP}%d skipped${C_RESET}\n" \
         "$STEPS_OK" "$STEPS_FAIL" "$STEPS_SKIP"
@@ -171,6 +217,7 @@ main() {
     install_packages
     create_symlinks
     rebuild_font_cache
+    install_root_files
     final_summary
 }
 
