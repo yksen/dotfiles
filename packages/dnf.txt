@@ -18,4 +18,5 @@ tmux
 uv
 vim
 xset
+xsettingsd
 zoxide

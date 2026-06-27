@@ -4,6 +4,11 @@
 WALLPAPER_DIR=$( cd -- "$( dirname -- "$(readlink -f "${BASH_SOURCE[0]}")" )" &> /dev/null && pwd )
 feh --no-fehbg --bg-scale "$WALLPAPER_DIR/../wallpaper.png"
 
+# Serve the dark theme to GTK/Qt apps over XSETTINGS for the whole session
+if command -v xsettingsd &> /dev/null && ! pgrep -x xsettingsd > /dev/null; then
+    xsettingsd &
+fi
+
 # TODO: Set it per hardware device (don't change touchpad speed)
 # for id in $(xinput list | grep -Po 'id=\K\d+(?=.*pointer)'); do
 #     xinput --set-prop "$id" 'libinput Accel Speed' -0.7 2>/dev/null || true

@@ -19,6 +19,12 @@ hide_edge_borders smart
 
 font pango:monospace 8
 
+# Import the X session env into D-Bus + systemd and bring up the graphical
+# session target so xdg-desktop-portal activates (needed for dark-mode detection
+# in Firefox/Chrome/Electron/GTK4 apps under i3).
+exec --no-startup-id dbus-update-activation-environment --systemd --all
+exec --no-startup-id systemctl --user start i3-session.target
+
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex-autostart --autostart --environment i3

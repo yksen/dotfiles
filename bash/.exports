@@ -6,7 +6,7 @@ export TERTIARY_COLOR="\e[38;5;219m"
 
 export FZF_DEFAULT_COMMAND='find .'
 export GTK_THEME=Adwaita:dark
-export QT_STYLE_OVERRIDE=Adwaita:dark
+export QT_QPA_PLATFORMTHEME=gtk3
 export HISTCONTROL='ignoreboth';
 export HISTSIZE=
 export HISTFILE=~/.bash_history_eternal
