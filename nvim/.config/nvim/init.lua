@@ -80,6 +80,7 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -142,50 +143,6 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
-	{
-		"coder/claudecode.nvim",
-		dependencies = { "folke/snacks.nvim" },
-		config = true,
-		-- `cmd` lets lazy.nvim create command stubs that load the plugin on first use,
-		-- so `:ClaudeCode` and friends work on a fresh start. Without it, a keys-only
-		-- spec defers loading until a <leader>a* mapping is pressed and the commands
-		-- would not exist yet.
-		cmd = {
-			"ClaudeCode",
-			"ClaudeCodeFocus",
-			"ClaudeCodeSelectModel",
-			"ClaudeCodeAdd",
-			"ClaudeCodeSend",
-			"ClaudeCodeTreeAdd",
-			"ClaudeCodeStatus",
-			"ClaudeCodeStart",
-			"ClaudeCodeStop",
-			"ClaudeCodeOpen",
-			"ClaudeCodeClose",
-			"ClaudeCodeDiffAccept",
-			"ClaudeCodeDiffDeny",
-			"ClaudeCodeCloseAllDiffs",
-		},
-		keys = {
-			{ "<leader>a", nil, desc = "AI/Claude Code" },
-			{ "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
-			{ "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
-			{ "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
-			{ "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
-			{ "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },
-			{ "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
-			{ "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
-			{
-				"<leader>as",
-				"<cmd>ClaudeCodeTreeAdd<cr>",
-				desc = "Add file",
-				ft = { "NvimTree", "neo-tree", "oil", "minifiles", "netrw", "snacks_picker_list" },
-			},
-			-- Diff management
-			{ "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
-			{ "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
-		},
-	},
 	{
 		"kdheepak/lazygit.nvim",
 		lazy = true,
@@ -365,6 +322,11 @@ require("lazy").setup({
 				--     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
 				--   },
 				-- },
+				defaults = {
+					-- nvim-treesitter `main` dropped the API telescope's previewer used
+					-- (ft_to_lang / configs), so use regex highlighting in previews instead.
+					preview = { treesitter = false },
+				},
 				pickers = {
 					find_files = {
 						hidden = true,
@@ -602,7 +564,23 @@ require("lazy").setup({
 			--  - settings (table): Override the default settings passed when initializing the server.
 			--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 			local servers = {
-				clangd = {},
+				clangd = {
+					-- Generic clangd tuning (no project specifics). Cross-compiler projects
+					-- (e.g. ESP32) need --query-driver so clangd can extract the toolchain's
+					-- system headers; the glob allows any toolchain under $HOME or /usr/bin.
+					-- The exact compiler path for such a project belongs in its own .clangd file.
+					cmd = {
+						"clangd",
+						"--background-index",
+						"--clang-tidy",
+						"--header-insertion=iwyu",
+						"--completion-style=detailed",
+						"--function-arg-placeholders",
+						"--fallback-style=llvm",
+						"--pch-storage=memory",
+						"--query-driver=" .. vim.fn.expand("$HOME") .. "/**/bin/*,/usr/bin/*",
+					},
+				},
 				cmake = {},
 				-- gopls = {},
 				-- pyright = {},
@@ -900,14 +878,15 @@ require("lazy").setup({
 	},
 	{ -- Highlight, edit, and navigate code
 		"nvim-treesitter/nvim-treesitter",
-		branch = "master", -- The `main` branch is a rewrite that drops the `configs` API used below
+		branch = "main", -- required for Neovim 0.12; the `master` branch is frozen at 0.11
+		lazy = false,
 		build = ":TSUpdate",
-		main = "nvim-treesitter.configs", -- Sets main module to use for opts
-		-- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-		opts = {
-			ensure_installed = {
+		config = function()
+			-- Keep these parsers installed (async; a no-op if already present).
+			require("nvim-treesitter").install({
 				"bash",
 				"c",
+				"cpp",
 				"diff",
 				"html",
 				"lua",
@@ -917,24 +896,18 @@ require("lazy").setup({
 				"query",
 				"vim",
 				"vimdoc",
-			},
-			-- Autoinstall languages that are not installed
-			auto_install = true,
-			highlight = {
-				enable = true,
-				-- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-				--  If you are experiencing weird indenting issues, add the language to
-				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
-				additional_vim_regex_highlighting = { "ruby" },
-			},
-			indent = { enable = true, disable = { "ruby" } },
-		},
-		-- There are additional nvim-treesitter modules that you can use to interact
-		-- with nvim-treesitter. You should go explore a few and see what interests you:
-		--
-		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+			})
+
+			-- The `main` branch drops the old module/`configs` system, so enable
+			-- Neovim's native treesitter highlighting (+ experimental indent) per buffer.
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function(args)
+					if pcall(vim.treesitter.start, args.buf) then
+						vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+					end
+				end,
+			})
+		end,
 	},
 
 	-- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
