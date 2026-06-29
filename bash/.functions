@@ -8,9 +8,21 @@ function dtm() {
 }
 
 function gsa() {
+    local reset="\e[0m" sep=" · "
     for dir in */; do
         if [ -d "$dir/.git" ]; then
-            echo "$dir"
+            local branch counts behind ahead state
+            branch="$(git -C "$dir" rev-parse --abbrev-ref HEAD 2>/dev/null)"
+            if counts="$(git -C "$dir" rev-list --left-right --count '@{upstream}...HEAD' 2>/dev/null)"; then
+                read -r behind ahead <<< "$counts"
+                state=""
+                [ "$ahead" -gt 0 ] && state="↑${ahead}"
+                [ "$behind" -gt 0 ] && state="${state}↓${behind}"
+                state="${state:-up to date}"
+            else
+                state="no upstream"
+            fi
+            echo -e "${PRIMARY_COLOR}${dir%/}${reset}${sep}${SECONDARY_COLOR}${branch}${reset}${sep}${TERTIARY_COLOR}${state}${reset}"
             git -C "$dir" status -s
         fi
     done
