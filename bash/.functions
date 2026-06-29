@@ -28,6 +28,33 @@ function gsa() {
     done
 }
 
+function gpa() {
+    local reset="\e[0m" sep=" · " max=8 tmp dirs=() d first log
+    local osc='\e]8;;' st='\e\\'
+    tmp="$(mktemp -d -t gpa.XXXXXX)"
+    for d in */; do
+        [ -d "$d/.git" ] && dirs+=("${d%/}")
+    done
+    (
+        for d in "${dirs[@]}"; do
+            git -C "$d" pull --ff-only >"$tmp/$d.log" 2>&1 &
+            while [ "$(jobs -rp | wc -l)" -ge "$max" ]; do wait -n; done
+        done
+        wait
+    )
+    for d in "${dirs[@]}"; do
+        first="$(head -1 "$tmp/$d.log")"
+        if [ "$(wc -l < "$tmp/$d.log")" -le 1 ]; then
+            echo -e "${PRIMARY_COLOR}${d}${reset}${sep}${SECONDARY_COLOR}${first}${reset}"
+            rm -f "$tmp/$d.log"
+        else
+            log="${tmp}/${d}.log"
+            echo -e "${PRIMARY_COLOR}${d}${reset}${sep}${SECONDARY_COLOR}${first}${reset}${sep}${TERTIARY_COLOR}${osc}file://${HOSTNAME}${log}${st}${log}${osc}${st}${reset}"
+        fi
+    done
+    rmdir "$tmp" 2>/dev/null
+}
+
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
 	command yazi "$@" --cwd-file="$tmp"
