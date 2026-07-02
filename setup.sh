@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 SOURCE_DIR="$HOME"
 TARGET_DIRS=$(ls "$SCRIPT_DIR"/*/ -d)
 
-EXCLUDES=(-not -path "*packages*" -not -path "*xorg.conf.d*")
+EXCLUDES=(-not -path "*packages*" -not -path "*xorg.conf.d*" -not -path "*dconf*")
 
 LOG_FILE="${TMPDIR:-/tmp}/dotfiles-setup.log"
 
@@ -158,6 +158,33 @@ rebuild_font_cache() {
     fi
 }
 
+apply_gsettings() {
+    local KEYFILE="$SCRIPT_DIR/dconf/dconf.ini"
+
+    if ! command -v dconf &>/dev/null; then
+        status skip "GSettings: dconf not found"
+        return
+    fi
+    if [ ! -f "$KEYFILE" ]; then
+        status skip "GSettings: no keyfile at dconf/dconf.ini"
+        return
+    fi
+
+    if ! ask "Load GSettings from dconf/dconf.ini?"; then
+        status skip "GSettings: declined"
+        return
+    fi
+
+    local keys
+    keys=$(grep -cE '^\S+=' "$KEYFILE")
+    echo "\$ dconf load / < $KEYFILE" >>"$LOG_FILE"
+    if dconf load / <"$KEYFILE" 2>>"$LOG_FILE"; then
+        status ok "GSettings" "$keys key(s) loaded from dconf.ini"
+    else
+        status fail "GSettings (dconf load failed, see $LOG_FILE)"
+    fi
+}
+
 ROOT_FILES=(
     "x11/xorg.conf.d/60-mouse-accel.conf:/etc/X11/xorg.conf.d/60-mouse-accel.conf"
 )
@@ -217,6 +244,7 @@ main() {
     install_packages
     create_symlinks
     rebuild_font_cache
+    apply_gsettings
     install_root_files
     final_summary
 }
