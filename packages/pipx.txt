@@ -1,0 +1,4 @@
+# Python apps installed in isolated environments via pipx.
+# One package per line; blank lines and # comments are ignored.
+
+i3-resurrect

@@ -1,0 +1,8 @@
+{
+    "directory": "~/.local/state/i3-resurrect",
+    "terminals": ["kitty"],
+    "window_command_mappings": [
+        { "class": "Gnome-terminal", "command": "gnome-terminal" }
+    ],
+    "window_swallow_criteria": {}
+}

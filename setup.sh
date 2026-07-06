@@ -97,6 +97,56 @@ install_packages() {
     fi
 }
 
+install_pipx_apps() {
+    local PIPX_FILE="$SCRIPT_DIR/packages/pipx.txt"
+    local APPS
+
+    if ! command -v pipx &>/dev/null; then
+        status skip "Pipx apps: pipx not found"
+        return
+    fi
+
+    APPS=$(grep -vE '^\s*(#|$)' "$PIPX_FILE" 2>/dev/null)
+    if [ -z "$APPS" ]; then
+        status skip "Pipx apps: nothing listed in pipx.txt"
+        return
+    fi
+
+    local requested
+    requested=$(echo "$APPS" | wc -l)
+
+    if ! ask "Install $requested pipx app(s)?"; then
+        status skip "Pipx apps: declined" "$requested requested"
+        return
+    fi
+
+    # Package names already installed by pipx (first column of the short list).
+    local present
+    present=$(pipx list --short 2>/dev/null | awk '{print $1}')
+
+    local installed=0 already=0 failed=0 app
+    while IFS= read -r app; do
+        [ -z "$app" ] && continue
+        if grep -qxF "$app" <<<"$present"; then
+            ((already++))
+            continue
+        fi
+        if run_quiet pipx install "$app"; then
+            ((installed++))
+        else
+            ((failed++))
+            echo "failed to pipx install $app" >>"$LOG_FILE"
+        fi
+    done <<<"$APPS"
+
+    local detail="$installed installed, $already already present, $failed failed"
+    if [ "$failed" -eq 0 ]; then
+        status ok "Pipx apps" "$detail"
+    else
+        status fail "Pipx apps (see $LOG_FILE)" "$detail"
+    fi
+}
+
 create_symlinks() {
     if ! ask "Create symlinks for dotfiles?"; then
         status skip "Symlinks: declined"
@@ -231,6 +281,41 @@ install_root_files() {
     fi
 }
 
+# systemd user units are symlinked by create_symlinks but not activated by it;
+# enable (and start) the ones that need to be running for the session.
+enable_user_units() {
+    local UNITS=(i3-session-save.service)
+
+    if ! command -v systemctl &>/dev/null; then
+        status skip "User units: systemctl not found"
+        return
+    fi
+
+    if ! ask "Enable ${#UNITS[@]} systemd user unit(s)?"; then
+        status skip "User units: declined"
+        return
+    fi
+
+    run_quiet systemctl --user daemon-reload
+
+    local enabled=0 failed=0 unit
+    for unit in "${UNITS[@]}"; do
+        if run_quiet systemctl --user enable --now "$unit"; then
+            ((enabled++))
+        else
+            ((failed++))
+            echo "failed to enable $unit" >>"$LOG_FILE"
+        fi
+    done
+
+    local detail="$enabled enabled, $failed failed"
+    if [ "$failed" -eq 0 ]; then
+        status ok "User units" "$detail"
+    else
+        status fail "User units (see $LOG_FILE)" "$detail"
+    fi
+}
+
 final_summary() {
     printf "\n  ${C_OK}%d ok${C_RESET}, ${C_FAIL}%d failed${C_RESET}, ${C_SKIP}%d skipped${C_RESET}\n" \
         "$STEPS_OK" "$STEPS_FAIL" "$STEPS_SKIP"
@@ -242,10 +327,12 @@ final_summary() {
 main() {
     : >"$LOG_FILE"
     install_packages
+    install_pipx_apps
     create_symlinks
     rebuild_font_cache
     apply_gsettings
     install_root_files
+    enable_user_units
     final_summary
 }
 
