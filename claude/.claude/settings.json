@@ -2,9 +2,9 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
-  "preferredNotifChannel": "terminal_bell",
   "model": "opus",
   "effortLevel": "xhigh",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark"
+  "theme": "dark",
+  "preferredNotifChannel": "terminal_bell"
 }
