@@ -32,6 +32,7 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- ~/.config/i3/lock.sh
 exec --no-startup-id copyq
 exec --no-startup-id redshift -l 51:17
 exec --no-startup-id . ~/.xprofile
+exec --no-startup-id ~/.local/bin/displaylink-setup.sh
 
 # Keybinds
 set $refresh_i3blocks pkill -SIGUSR1 i3blocks
@@ -216,4 +217,11 @@ bindsym $mod+r mode "resize"
 
 bar {
         status_command 2>/tmp/err SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks -vvv
+        # Ordered fallback list: i3bar uses the first output that is available.
+        # A fixed name is preferred over primary because it survives RandR
+        # reconfiguration, which is what makes i3bar lose the tray. primary is
+        # the portable backstop for machines whose panel is not called eDP -
+        # a list matching nothing at all means no tray, not a default tray.
+        tray_output eDP
+        tray_output primary
 }
