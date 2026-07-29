@@ -33,6 +33,7 @@ exec --no-startup-id copyq
 exec --no-startup-id redshift -l 51:17
 exec --no-startup-id . ~/.xprofile
 exec --no-startup-id ~/.local/bin/displaylink-setup.sh
+exec --no-startup-id ~/.local/bin/touchscreen-map.sh --startup
 
 # Keybinds
 set $refresh_i3blocks pkill -SIGUSR1 i3blocks
@@ -63,6 +64,11 @@ bindsym Control+$mod+h exec --no-startup-id autorandr -c horizontal
 # Restore is meant to be run once on a fresh login.
 bindsym Control+$mod+s exec --no-startup-id ~/.local/bin/i3-session-save.sh
 bindsym Control+$mod+r exec --no-startup-id ~/.local/bin/i3-session-restore.sh
+
+# Point the touchscreen at the next output. The touch matrix is a fraction of the
+# whole X screen, so it also needs re-applying after a dock/undock - this is that
+# too, since cycling all the way round lands back on the panel.
+bindsym Control+$mod+t exec --no-startup-id ~/.local/bin/touchscreen-map.sh --cycle
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
