@@ -5,6 +5,7 @@
   "model": "opus",
   "effortLevel": "xhigh",
   "skipDangerousModePermissionPrompt": true,
+  "showClearContextOnPlanAccept": true,
   "theme": "dark",
   "preferredNotifChannel": "terminal_bell"
 }
