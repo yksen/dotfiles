@@ -172,5 +172,5 @@ print_block
 if [[ $SUBSCRIBE == 1 ]] ; then
     while read -r EVENT; do
         print_block
-    done < <(pactl subscribe | stdbuf -oL grep change)
+    done < <(pactl subscribe | stdbuf -oL grep -E "on (sink|source|server|card) ")
 fi
