@@ -17,3 +17,8 @@ shopt -s histappend;
 shopt -s nocaseglob;
 
 eval "$(zoxide init bash --cmd cd)";
+
+function cdi() {
+    __zoxide_zi "$@"
+    unset TIMER
+}
