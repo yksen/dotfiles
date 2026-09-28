@@ -2,10 +2,10 @@
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
-  "model": "opus",
+  "model": "sonnet",
   "effortLevel": "xhigh",
-  "skipDangerousModePermissionPrompt": true,
   "showClearContextOnPlanAccept": true,
+  "skipDangerousModePermissionPrompt": true,
   "theme": "dark",
   "preferredNotifChannel": "terminal_bell"
 }
