@@ -5,6 +5,7 @@ export SECONDARY_COLOR="\e[38;5;200m"
 export TERTIARY_COLOR="\e[38;5;219m"
 
 export FZF_DEFAULT_COMMAND='find .'
+export _ZO_FZF_OPTS='--preview-window=hidden'
 export GTK_THEME=Adwaita:dark
 export QT_QPA_PLATFORMTHEME=gtk3
 export HISTCONTROL='ignoreboth';
