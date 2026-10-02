@@ -1,0 +1,5 @@
+{
+  "name": "model-hint",
+  "version": "0.1.0",
+  "description": "Shows the active model at the end of the prompt hint line"
+}
