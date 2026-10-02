@@ -12,6 +12,7 @@ gnome-themes-extra
 i3blocks
 lazygit
 lsd
+mesa-va-drivers-freeworld
 neovim
 pipx
 ripgrep
