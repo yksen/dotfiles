@@ -6,7 +6,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 SOURCE_DIR="$HOME"
 TARGET_DIRS=$(ls "$SCRIPT_DIR"/*/ -d)
 
-EXCLUDES=(-not -path "*packages*" -not -path "*xorg.conf.d*" -not -path "*dconf*" -not -path "*modules-load.d*")
+EXCLUDES=(-not -path "*packages*" -not -path "*xorg.conf.d*" -not -path "*dconf*" -not -path "*systemd/system*")
 
 LOG_FILE="${TMPDIR:-/tmp}/dotfiles-setup.log"
 
@@ -237,7 +237,7 @@ apply_gsettings() {
 
 ROOT_FILES=(
     "x11/xorg.conf.d/60-mouse-accel.conf:/etc/X11/xorg.conf.d/60-mouse-accel.conf"
-    "modules-load.d/vkms.conf:/etc/modules-load.d/vkms.conf"
+    "systemd/system/lightdm.service.d/evdi-before-x.conf:/etc/systemd/system/lightdm.service.d/evdi-before-x.conf"
 )
 
 install_root_files() {
