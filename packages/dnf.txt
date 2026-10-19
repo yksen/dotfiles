@@ -4,6 +4,7 @@ btop
 cmake
 delta
 dust
+flameshot
 fzf
 gcc
 gcc-c++

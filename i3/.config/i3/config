@@ -50,10 +50,10 @@ bindsym XF86AudioPrev exec --no-startup-id playerctl previous
 bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl s 10%-
 bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl s 10%+
 
-bindsym Print exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
+bindsym Print exec --no-startup-id flameshot gui --clipboard
 bindsym Ctrl+Print exec --no-startup-id ~/.local/bin/ocr.sh
-bindsym Shift+Print exec --no-startup-id maim -s ~/downloads/$(date +%Y-%m-%d_%H-%M-%S).png
-bindsym XF86Launch2 exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
+bindsym Shift+Print exec --no-startup-id flameshot gui --path ~/downloads
+bindsym XF86Launch2 exec --no-startup-id flameshot gui --clipboard
 
 bindsym Control+$mod+l exec --no-startup-id ~/.config/i3/lock.sh
 bindsym Control+$mod+v exec --no-startup-id copyq toggle
