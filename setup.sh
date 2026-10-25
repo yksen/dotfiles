@@ -229,13 +229,38 @@ install_github_binaries() {
     fi
 }
 
+# Symlink ~/.local/bin/<name> to each app's exported (system) launcher.
+# Args are "id=name" pairs.
+link_flatpak_apps() {
+    local BIN_DIR="$HOME/.local/bin" EXPORTS=/var/lib/flatpak/exports/bin pair app
+    mkdir -p "$BIN_DIR"
+    for pair in "$@"; do
+        app="${pair%%=*}"
+        [ -e "$EXPORTS/$app" ] || continue
+        ln -sfn "$EXPORTS/$app" "$BIN_DIR/${pair#*=}"
+        log "flatpak: linked $BIN_DIR/${pair#*=} -> $EXPORTS/$app"
+    done
+}
+
 # Install Flatpak apps from Flathub (packages/flatpak.txt). The flathub remote
-# is added only when missing; the flatpak package comes from dnf.txt.
+# is added only when missing; the flatpak package comes from dnf.txt. Each app
+# also gets a short lowercase launcher symlink in ~/.local/bin.
 install_flatpak_apps() {
     local LIST="$SCRIPT_DIR/packages/flatpak.txt"
     local APPS
 
-    APPS=$(grep -vE '^\s*(#|$)' "$LIST" 2>/dev/null)
+    # Each line is "app-id command-name"; both columns are required.
+    local id name links=() malformed=0
+    while read -r id name; do
+        [ -z "$id" ] && continue
+        if [ -z "$name" ]; then
+            ((malformed++))
+            echo "flatpak.txt: no command name for $id, skipped" >>"$LOG_FILE"
+            continue
+        fi
+        APPS+="$id "
+        links+=("$id=$name")
+    done < <(grep -vE '^\s*(#|$)' "$LIST" 2>/dev/null)
     if [ -z "$APPS" ]; then
         status skip "Flatpak: nothing listed in flatpak.txt"
         return
@@ -256,6 +281,7 @@ install_flatpak_apps() {
     local present=$(($(wc -w <<<"$APPS") - ${#todo[@]}))
     if [ "$need_remote" -eq 0 ] && [ "${#todo[@]}" -eq 0 ]; then
         log "flatpak: all apps already installed"
+        link_flatpak_apps "${links[@]}"
         status ok "Flatpak apps" "0 installed, $present already present"
         return
     fi
@@ -281,7 +307,11 @@ install_flatpak_apps() {
         fi
     done
 
+    link_flatpak_apps "${links[@]}"
+
     local detail="$installed installed, $present already present, $failed failed"
+    failed=$((failed + malformed))
+    [ "$malformed" -gt 0 ] && detail+=", $malformed without a command name"
     if [ "$failed" -eq 0 ]; then
         status ok "Flatpak apps" "$detail"
     else

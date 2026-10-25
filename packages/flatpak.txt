@@ -1,6 +1,7 @@
 # Flatpak apps installed from Flathub (system-wide).
-# One application ID per line; blank lines and # comments are ignored.
+# One "application-id command-name" pair per line; blank lines and # comments
+# are ignored. command-name is the symlink created in ~/.local/bin.
 
-com.bitwarden.desktop
-io.anytype.anytype
-org.signal.Signal
+com.bitwarden.desktop bitwarden
+io.anytype.anytype anytype
+org.signal.Signal signal
