@@ -1,0 +1,6 @@
+# Binaries installed from GitHub releases into ~/.local/bin.
+# One "owner/repo" per line; blank lines and # comments are ignored.
+# The linux x86_64 .tar.gz asset of the latest release is used; the binary
+# is expected to be named like the repo.
+
+jesseduffield/lazydocker

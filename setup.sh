@@ -47,6 +47,11 @@ status() {
     [ -n "$detail" ] && printf "    ${C_DIM}%s${C_RESET}\n" "$detail"
 }
 
+# Append a line to the log (successful actions, so the log shows what was done).
+log() {
+    echo "$*" >>"$LOG_FILE"
+}
+
 # Run a command with all output redirected to the log file.
 run_quiet() {
     echo "\$ $*" >>"$LOG_FILE"
@@ -91,6 +96,7 @@ install_packages() {
 
     local detail="$installed installed, $already already present, $missing not found"
     if [ "$rc" -eq 0 ]; then
+        log "dnf: $detail"
         status ok "Packages" "$detail"
     else
         status fail "Packages (dnf exited $rc, see $LOG_FILE)" "$detail"
@@ -133,6 +139,7 @@ install_pipx_apps() {
         fi
         if run_quiet pipx install "$app"; then
             ((installed++))
+            log "pipx installed $app"
         else
             ((failed++))
             echo "failed to pipx install $app" >>"$LOG_FILE"
@@ -144,6 +151,81 @@ install_pipx_apps() {
         status ok "Pipx apps" "$detail"
     else
         status fail "Pipx apps (see $LOG_FILE)" "$detail"
+    fi
+}
+
+# Install/update binaries from GitHub releases (packages/github.txt) into
+# ~/.local/bin. The installed tag is recorded in a stamp file, so reruns only
+# touch repos whose latest release changed.
+install_github_binaries() {
+    local LIST="$SCRIPT_DIR/packages/github.txt"
+    local BIN_DIR="$HOME/.local/bin"
+    local STAMP_DIR="$HOME/.local/share/dotfiles-bins"
+    local REPOS
+
+    REPOS=$(grep -vE '^\s*(#|$)' "$LIST" 2>/dev/null)
+    if [ -z "$REPOS" ]; then
+        status skip "GitHub binaries: nothing listed in github.txt"
+        return
+    fi
+    if ! command -v curl &>/dev/null; then
+        status skip "GitHub binaries: curl not found"
+        return
+    fi
+
+    # Resolve latest tag + asset URL for each repo; keep only those out of date.
+    local todo=() uptodate=0 failed=0 repo name json tag url
+    for repo in $REPOS; do
+        name="${repo##*/}"
+        echo "\$ curl https://api.github.com/repos/$repo/releases/latest" >>"$LOG_FILE"
+        json=$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest" 2>>"$LOG_FILE")
+        tag=$(grep -m1 '"tag_name"' <<<"$json" | cut -d'"' -f4)
+        url=$(grep -o '"browser_download_url": *"[^"]*"' <<<"$json" | cut -d'"' -f4 |
+            grep -iE 'linux' | grep -iE 'x86_64|amd64' | grep -iE '\.tar\.gz$' | head -n1)
+        if [ -z "$tag" ] || [ -z "$url" ]; then
+            ((failed++))
+            echo "no linux x86_64 tar.gz release found for $repo" >>"$LOG_FILE"
+            continue
+        fi
+        if [ -x "$BIN_DIR/$name" ] && [ "$(cat "$STAMP_DIR/$name" 2>/dev/null)" = "$tag" ]; then
+            ((uptodate++))
+            log "github: $name $tag already up to date"
+            continue
+        fi
+        todo+=("$repo|$tag|$url")
+    done
+
+    if [ "${#todo[@]}" -gt 0 ]; then
+        if ! ask "Install/update ${#todo[@]} GitHub binary(ies) into ~/.local/bin?"; then
+            status skip "GitHub binaries: declined" "${#todo[@]} pending, $uptodate up to date"
+            return
+        fi
+    fi
+
+    local installed=0 entry tmp
+    mkdir -p "$BIN_DIR" "$STAMP_DIR"
+    for entry in "${todo[@]}"; do
+        IFS='|' read -r repo tag url <<<"$entry"
+        name="${repo##*/}"
+        tmp=$(mktemp -d)
+        if run_quiet curl -fsSL -o "$tmp/asset.tar.gz" "$url" &&
+            run_quiet tar -xzf "$tmp/asset.tar.gz" -C "$tmp" "$name" &&
+            run_quiet install -m 755 "$tmp/$name" "$BIN_DIR/$name"; then
+            echo "$tag" >"$STAMP_DIR/$name"
+            ((installed++))
+            log "github: installed $name $tag -> $BIN_DIR/$name"
+        else
+            ((failed++))
+            echo "failed to install $repo $tag" >>"$LOG_FILE"
+        fi
+        rm -rf "$tmp"
+    done
+
+    local detail="$installed installed/updated, $uptodate up to date, $failed failed"
+    if [ "$failed" -eq 0 ]; then
+        status ok "GitHub binaries" "$detail"
+    else
+        status fail "GitHub binaries (see $LOG_FILE)" "$detail"
     fi
 }
 
@@ -163,11 +245,13 @@ create_symlinks() {
             # Already linked to the right target -> nothing to do.
             if [ "$(readlink -f "$SOURCE_PATH" 2>/dev/null)" = "$TARGET_FILE" ]; then
                 ((existed++))
+                log "already linked $SOURCE_PATH"
                 continue
             fi
             if mkdir -p "$(dirname "$SOURCE_PATH")" 2>>"$LOG_FILE" &&
                 ln -sf "$TARGET_FILE" "$SOURCE_PATH" 2>>"$LOG_FILE"; then
                 ((created++))
+                log "linked $SOURCE_PATH -> $TARGET_FILE"
             else
                 ((failed++))
                 echo "failed to link $SOURCE_PATH -> $TARGET_FILE" >>"$LOG_FILE"
@@ -202,6 +286,7 @@ rebuild_font_cache() {
 
     local detail="$fonts fonts across $dirs directories"
     if [ "$rc" -eq 0 ]; then
+        log "fc-cache: $detail"
         status ok "Font cache" "$detail"
     else
         status fail "Font cache (fc-cache exited $rc, see $LOG_FILE)" "$detail"
@@ -229,6 +314,7 @@ apply_gsettings() {
     keys=$(grep -cE '^\S+=' "$KEYFILE")
     echo "\$ dconf load / < $KEYFILE" >>"$LOG_FILE"
     if dconf load / <"$KEYFILE" 2>>"$LOG_FILE"; then
+        log "dconf: loaded $keys key(s) from $KEYFILE"
         status ok "GSettings" "$keys key(s) loaded from dconf.ini"
     else
         status fail "GSettings (dconf load failed, see $LOG_FILE)"
@@ -254,6 +340,7 @@ install_root_files() {
     done
 
     if [ "$needs_install" -eq 0 ]; then
+        log "root files: already up to date"
         status ok "Root files" "already up to date"
         return
     fi
@@ -268,6 +355,7 @@ install_root_files() {
         src="$SCRIPT_DIR/${entry%%:*}" dest="${entry#*:}"
         if run_quiet sudo mkdir -p "$(dirname "$dest")" && run_quiet sudo cp "$src" "$dest"; then
             ((copied++))
+            log "copied $src -> $dest"
         else
             ((failed++))
             echo "failed to copy $src -> $dest" >>"$LOG_FILE"
@@ -303,6 +391,7 @@ enable_user_units() {
     for unit in "${UNITS[@]}"; do
         if run_quiet systemctl --user enable --now "$unit"; then
             ((enabled++))
+            log "enabled and started $unit"
         else
             ((failed++))
             echo "failed to enable $unit" >>"$LOG_FILE"
@@ -329,6 +418,7 @@ main() {
     : >"$LOG_FILE"
     install_packages
     install_pipx_apps
+    install_github_binaries
     create_symlinks
     rebuild_font_cache
     apply_gsettings
