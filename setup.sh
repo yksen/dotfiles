@@ -229,6 +229,66 @@ install_github_binaries() {
     fi
 }
 
+# Install Flatpak apps from Flathub (packages/flatpak.txt). The flathub remote
+# is added only when missing; the flatpak package comes from dnf.txt.
+install_flatpak_apps() {
+    local LIST="$SCRIPT_DIR/packages/flatpak.txt"
+    local APPS
+
+    APPS=$(grep -vE '^\s*(#|$)' "$LIST" 2>/dev/null)
+    if [ -z "$APPS" ]; then
+        status skip "Flatpak: nothing listed in flatpak.txt"
+        return
+    fi
+
+    # flatpak itself comes from dnf.txt, which is installed first.
+    if ! command -v flatpak &>/dev/null; then
+        status skip "Flatpak: flatpak not installed (add it to dnf.txt)"
+        return
+    fi
+
+    local need_remote=0 todo=() app
+    flatpak remotes --columns=name 2>/dev/null | grep -qx flathub || need_remote=1
+    for app in $APPS; do
+        flatpak info "$app" &>/dev/null || todo+=("$app")
+    done
+
+    local present=$(($(wc -w <<<"$APPS") - ${#todo[@]}))
+    if [ "$need_remote" -eq 0 ] && [ "${#todo[@]}" -eq 0 ]; then
+        log "flatpak: all apps already installed"
+        status ok "Flatpak apps" "0 installed, $present already present"
+        return
+    fi
+
+    if ! ask "Install ${#todo[@]} Flatpak app(s) from Flathub?"; then
+        status skip "Flatpak: declined" "${#todo[@]} pending, $present already present"
+        return
+    fi
+
+    if [ "$need_remote" -eq 1 ] && ! run_quiet sudo flatpak remote-add --if-not-exists flathub \
+        https://dl.flathub.org/repo/flathub.flatpakrepo; then
+        status fail "Flatpak (could not add flathub remote, see $LOG_FILE)"
+        return
+    fi
+
+    local installed=0 failed=0
+    for app in "${todo[@]}"; do
+        if run_quiet sudo flatpak install -y --noninteractive flathub "$app"; then
+            ((installed++))
+            log "flatpak: installed $app"
+        else
+            ((failed++))
+        fi
+    done
+
+    local detail="$installed installed, $present already present, $failed failed"
+    if [ "$failed" -eq 0 ]; then
+        status ok "Flatpak apps" "$detail"
+    else
+        status fail "Flatpak apps (see $LOG_FILE)" "$detail"
+    fi
+}
+
 create_symlinks() {
     if ! ask "Create symlinks for dotfiles?"; then
         status skip "Symlinks: declined"
@@ -419,6 +479,7 @@ main() {
     install_packages
     install_pipx_apps
     install_github_binaries
+    install_flatpak_apps
     create_symlinks
     rebuild_font_cache
     apply_gsettings

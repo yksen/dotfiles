@@ -1,0 +1,6 @@
+# Flatpak apps installed from Flathub (system-wide).
+# One application ID per line; blank lines and # comments are ignored.
+
+com.bitwarden.desktop
+io.anytype.anytype
+org.signal.Signal

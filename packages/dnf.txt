@@ -5,6 +5,7 @@ cmake
 delta
 dust
 flameshot
+flatpak
 fzf
 gcc
 gcc-c++
